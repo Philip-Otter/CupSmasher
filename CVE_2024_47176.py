@@ -1,3 +1,5 @@
+# The 2xdropout 2024
+
 import socket
 
 def verify(data, printerName):
