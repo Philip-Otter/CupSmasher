@@ -1,4 +1,4 @@
-# CupSmasher is an exploit tool that takes advantage of an attack chain starting with CVE-2024-47176 and then one of three other CVEs: CVE-2024-47076, CVE-2024-47175, or CVE-2024-47177
+# CupSmasher is an exploit tool that takes advantage of an attack chain starting with the cups-browsed CVE-2024-47176 and then uses that in combination with CVE-2024-47076, CVE-2024-47175, and CVE-2024-47177 to lead to remote code execution.
 ---
 CupSmasher is a fork of [ipp-server](https://github.com/h2g2bob/ipp-server) and contains modified exploit code stemming from work done by [evilsocket](https://github.com/evilsocket)
 ---
