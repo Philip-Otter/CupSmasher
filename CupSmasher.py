@@ -42,7 +42,6 @@ parser.add_argument('--PRTPORT', default = 12345, help = 'Evil Print Server Port
 parser.add_argument('--printer', default = 'The2xprintout', help = 'Set printer name | Default:The2xprintout')
 parser.add_argument('--location', default = 'Office', help = 'Set the printer location | Default:Office')
 parser.add_argument('--info', default = 'Printer', help = 'Set the printer info | Default:Printer')
-parser.add_argument('--CVE', default = 1, help = "Select the second stage in the attack chain -> [1:CVE-2024-47076, 2:CVE-2024-47175, 3:CVE-2024-47177] | Default:1")
 parser.add_argument('-T', '--timeout', default = 480, help = "The timeout value to wait for a target response | Default:480")
 parser.add_argument('--verifyOnly', default = False, action = 'store_true', help = "Only verify CVE-2024-47176")
 parser.add_argument('--autoCheckOff', default = False, action = 'store_true', help = "Disable vulnerability check stage")
