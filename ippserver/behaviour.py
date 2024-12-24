@@ -407,7 +407,7 @@ class StatelessPrinter(Behaviour):
         return random.randint(1,9999)
 
     def handle_postscript(self, ipp_request, postscript_file):
-        raise NotImplementedError
+        pass  # Modified this line because it would cause CupSmasher to crash out when recieving a postscript job - The 2xdropout
 
 
 class RejectAllPrinter(StatelessPrinter):
