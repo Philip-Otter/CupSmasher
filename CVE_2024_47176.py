@@ -2,6 +2,14 @@
 
 import socket
 
+def snagKernal(data):
+    headers = data.split('\n')
+    print(f"\033[93m[CVE_2024_47176]\033[37m Finding Kernal Information")
+    for header in headers:
+        if "User-Agent" in header:
+            print(f'\033[93m[CVE_2024_47176]\033[37m Target Machine Kernal & Architecture:  {header.replace('User-Agent: ','')}')
+            
+
 def verify(data, printerName):
     headers = data.split('\n')
     print(f"\033[93m[CVE_2024_47176]\033[37m Evaluating Header:  {headers[0]}")
