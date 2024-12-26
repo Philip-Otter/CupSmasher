@@ -7,7 +7,7 @@ def snagKernal(data):
     print(f"\033[93m[CVE_2024_47176]\033[37m Finding Kernal Information")
     for header in headers:
         if "User-Agent" in header:
-            print(f'\033[93m[CVE_2024_47176]\033[37m Target Machine Kernal & Architecture:  {header.replace('User-Agent: ','')}')
+            print(f'\033[93m[CVE_2024_47176]\033[37m Target Machine Kernal & Architecture:  {header.replace("User-Agent: ","")}')
             
 
 def verify(data, printerName):
@@ -15,7 +15,7 @@ def verify(data, printerName):
     print(f"\033[93m[CVE_2024_47176]\033[37m Evaluating Header:  {headers[0]}")
     for header in headers:
         if "User-Agent" in header:
-            print(f'\033[93m[CVE_2024_47176]\033[37m Target Machine Kernal & Architecture:  {header.replace('User-Agent: ','')}')
+            print(f'\033[93m[CVE_2024_47176]\033[37m Target Machine Kernal & Architecture:  {header.replace("User-Agent: ","")}')
 
     if(printerName in headers[0]):
         print(f"\033[93m[CVE_2024_47176]\033[37m SYSTEM VULNERABLE!")
